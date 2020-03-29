@@ -1,0 +1,18 @@
+package br.com.desafio.rest;
+
+import javax.annotation.PostConstruct;
+import javax.ws.rs.Path;
+
+import br.com.desafio.dao.PessoaDAO;
+
+@Path("/pessoas")
+public class PessoasService {
+
+	private PessoaDAO pessoaDAO;
+	
+	@PostConstruct
+	private void init() {
+		pessoaDAO = new PessoaDAO();
+	}
+	
+}

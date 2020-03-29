@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<style>
+	.menu-bar {
+		background: 0c86d3;
+		height: 116.5px;
+		width: 100%;
+	}
+</style>
+<head>
+<meta charset="ISO-8859-1">
+<title>Gerenciamento de Pessoas</title>
+</head>
+<body>
+	<div class="menu-bar"></div>
+</body>
+</html>

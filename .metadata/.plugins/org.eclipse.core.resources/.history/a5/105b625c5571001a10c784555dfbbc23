@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<style>
+	.menu-bar {
+		background: 0c86d3;
+		height: 116.5px;
+		width: 100%;
+	}
+	.titulo-bar {
+		font-size: 22px;
+		margin: 10px;
+	}
+	.barra-botoes {
+		margin: 10px;
+	}
+</style>
+<head>
+<meta charset="ISO-8859-1">
+<title>Gerenciamento de Pessoas</title>
+</head>
+<body>
+	<div class="menu-bar">
+		<div class="titulo-bar">Administração de Pessoal</div>
+	</div>
+	<div class="barra-botoes">
+	
+	</div>
+</body>
+</html>

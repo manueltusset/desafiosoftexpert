@@ -1,0 +1,8 @@
+package br.com.desafio.rest;
+
+import javax.ws.rs.Path;
+
+@Path("/pessoas")
+public class PessoasService {
+
+}

@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html>
+<script type="text/javascript">
+	function request(verbo, url, body, functionErro, functionOK) {
+		if (!window.baseURL)
+			window.baseURL = window.location.href;
+		
+		var httpRequest = new XMLHttpRequest();
+		
+		httpRequest.onload = function(){
+			var data = httpRequest.responseText;
+			return functionOK(data);//sucess
+		}
+		
+		httpRequest.onerror = function() {
+			var data = httpRequest.responseText;
+			return functionErro(data);//error
+		}
+		
+		if (!url)
+			return alert('Url inválida!');
+		
+		if (!verbo)
+			verbo = 'POST';
+		
+		httpRequest.open(verbo, baseURL + '' + url, false);
+	    httpRequest.setRequestHeader('Content-Type', 'application/json;charset=utf-8');
+	    httpRequest.send(body);
+	}
+	function serializaForm(form) {
+	    var serializable = [];
+	    
+	    if (!form)
+	    	form = document.querySelector('form');
+
+	    form.querySelectorAll('input').forEach(function(inp){
+	        serializable.push(inp.getAttribute('id') + '=' + inp.value);
+	    });
+	    return serializable.join('&');
+	}
+	function serializaFormJSON(form) {
+	    var serializable = [];
+	    serializable.push('{');
+	    if (!form)
+	    	form = document.querySelector('form');
+
+	    form.querySelectorAll('input').forEach(function(inp){
+	        serializable.push(',' + '"' +inp.getAttribute('id') + '"' + ':' + (inp.getAttribute('type') && inp.getAttribute('type') === 'number' ? inp.value : '"' + inp.value + '"'));
+	    });
+	    serializable.push('}');
+
+        return serializable.join('').replace('{,', '{');
+	}
+    function selecionaReg(linha){
+    	if (linha){
+    		var table = linha.parentNode;
+    		
+    		table.querySelectorAll('tr[class="trSelected"]').forEach(function(tr){
+    			tr.removeAttribute('class');
+    		});
+    		linha.setAttribute('class', 'trSelected');
+    		populaCampos();
+    	}
+    }
+    function montaGridJA(json) {
+    	var html = [];
+    	html.push('<table cellpadding="0" cellspacing="0">');
+    	html.push('<tr id="cabecalho-grid">');
+    	html.push('<td>ID</td>');
+    	html.push('<td>Primeiro Nome</td>');
+    	html.push('<td>Último Nome</td>');
+    	html.push('<td>Idade</td>');
+    	html.push('</tr>');
+    	
+    	json.forEach(function(j){
+    		html.push('<tr onclick="selecionaReg(this);" id="reg">');
+    		html.push('<td>'+j.id+'</td>');
+    		html.push('<td>'+j.first_name+'</td>');
+    		html.push('<td>'+j.last_name+'</td>');
+    		html.push('<td>'+j.age+'</td>');
+    		html.push('</tr>');
+    	});
+    	html.push('</table>');
+    	document.querySelector('#dvGrid').innerHTML = html.join('');
+    }
+    function montaGridJO(json) {
+    	var html = [];
+    	html.push('<table cellpadding="0" cellspacing="0">');
+    	html.push('<tr id="cabecalho-grid">');
+    	html.push('<td>ID</td>');
+    	html.push('<td>Primeiro Nome</td>');
+    	html.push('<td>Último Nome</td>');
+    	html.push('<td>Idade</td>');
+    	html.push('</tr>');
+    	html.push('<tr class="trSelected" onclick="selecionaReg(this);" id="reg">');
+    	html.push('<td>'+json.id+'</td>');
+    	html.push('<td>'+json.first_name+'</td>');
+    	html.push('<td>'+json.last_name+'</td>');
+    	html.push('<td>'+json.age+'</td>');
+    	html.push('</tr>');
+    	html.push('</table>');
+    	document.querySelector('#dvGrid').innerHTML = html.join('');
+    }
+    function desabilitaCampos() {
+    	document.querySelectorAll('input').forEach(function(inp){
+    		inp.setAttribute('disabled', 'disabled');
+    		inp.setAttribute('readonly', 'readonly');
+    		inp.value = '';
+    	});
+    }
+    function habilitaCampos() {
+    	document.querySelectorAll('input').forEach(function(inp){
+    		inp.removeAttribute('disabled');
+    		inp.removeAttribute('readonly');
+    		inp.value = '';
+    	});
+    	document.querySelector('input[id="id"]').setAttribute('disabled', 'disabled');
+    	document.querySelector('input[id="id"]').setAttribute('readonly', 'readonly');
+    }
+    function populaCampos(){
+    	var tr = document.querySelector('.trSelected');
+    	var tds = tr.querySelectorAll('td');
+    	
+    	document.querySelector('input[id="id"]').value = tds[0].innerText;
+    	document.querySelector('input[id="first_name"]').value = tds[1].innerText;
+    	document.querySelector('input[id="last_name"]').value = tds[2].innerText;
+    	document.querySelector('input[id="age"]').value = tds[3].innerText;
+    }
+	function incluir() {
+		habilitaCampos();
+	}
+	function editar() {
+		habilitaCampos();
+	}
+	function salvar() {
+		
+	}
+	function cancelar() {
+		desabilitaCampos();
+		populaCampos();
+	}
+	function excluir() {
+		
+	}
+	function consultarTodas() {
+		request('GET', 'rest/pessoas/list', '', function(err){
+		    alert(err);
+		}, function(ok){
+		    var json = JSON.parse(ok);
+
+		    montaGridJA(json);
+		});
+	}
+	function consultarID() {
+		var id = prompt('Insira o ID da pessoa que deseja consultar');
+		
+		if (!id)
+			return alert('ID não preenchido');
+		
+		request('GET', 'rest/pessoas/get/' + id, '', function(err){
+		    alert(err);
+		}, function(ok){
+		    var json = JSON.parse(ok);
+
+		    montaGridJO(json);
+		    populaCampos();
+		});
+	}
+	window.onload = function(){
+		desabilitaCampos();
+	}
+</script>
+<style>
+	body {
+		font-family: Arial;
+		margin: 0;
+	}
+	.menu-bar {
+		background: #0c86d3;
+		height: 50px;
+		width: 100%;
+		margin: 0;
+	}
+	.titulo-bar {
+		font-size: 22px;
+		padding: 10px;
+		color: white;
+		padding-top: 13px;
+	}
+	.barra-botoes {
+		margin: 10px;
+	}
+	.botao {
+		height: 30px;
+		width: 115px;
+		border: none;
+		border-radius: 10px;
+		background: #0c86d3;
+		font-size: 14px;
+		color: white;
+		cursor: pointer;
+	}
+	.botao:hover {
+		opacity: 0.7;
+	}
+	.background-green {
+		background: #55a571;
+	}
+	.background-red {
+		background: #cc565c;
+	}
+	.dvInputs {
+		clear: both;
+		padding:5px;
+	}
+	input {
+		border-radius: 4px;
+		border:1px solid silver;
+		padding: 5px;
+		font-size: 13px;
+	}
+	.input-varchar {
+		height: 30px;
+		width: 200px;
+	}
+	.input-integer {
+		height: 30px;
+		width:60px;
+	}
+	table {
+		margin:10px;
+		font-size: 13px;
+	}
+	td {
+		border: 1px solid silver;
+		padding: 5px;
+	}
+	#cabecalho-grid td {
+		background: #d8d7d7;
+		font-weight: bold;
+	}
+	.trSelected {
+		color: white;
+		background: #1ea1f3 !important;
+	}
+	tr:nth-child(even) {background: #FFF}
+	tr:nth-child(odd) {background: #EEE}
+</style>
+<head>
+<meta charset="ISO-8859-1">
+<title>Gerenciamento de Pessoas</title>
+</head>
+<body>
+	<div class="menu-bar">
+		<div class="titulo-bar">Administração de Pessoal</div>
+	</div>
+	<div class="barra-botoes">
+		<button id="incluir" onclick="incluir();" class="botao" title="Incluir">Incluir</button>
+		<button id="editar" onclick="editar();" class="botao" title="Editar">Editar</button>
+		<button id="salvar" onclick="salvar();" class="botao background-green" title="Salvar">Salvar</button>
+		<button id="cancelar" onclick="cancelar();" class="botao background-red" title="Cancelar">Cancelar</button>
+		<button id="excluir" onclick="excluir();" class="botao" title="Excluir">Excluir</button>
+		<button id="consultarTodas" onclick="consultarTodas();" class="botao" title="Consultar Todas">Consultar Todas</button>
+		<button id="consultarID" onclick="consultarID();" class="botao" title="Consultar ID">Consultar ID</button>
+	</div>
+	<div id="campos">
+		<form id="frm0">
+			<div class="dvInputs">
+				<input id="id" class="input-integer" placeholder="ID">
+			</div>
+			<div class="dvInputs">
+				<input id="first_name" class="input-varchar" placeholder="Primeiro Nome">
+			</div>
+			<div class="dvInputs">
+				<input id="last_name" class="input-varchar" placeholder="Último Nome">
+			</div>
+			<div class="dvInputs">
+				<input type="number" id="age" class="input-integer" placeholder="Idade">
+			</div>
+		</form>
+	</div>
+	
+	<div id="dvGrid">
+		<table cellpadding="0" cellspacing="0">
+			<tr id="cabecalho-grid">
+				<td>ID</td>
+				<td>Primeiro Nome</td>
+				<td>Último Nome</td>
+				<td>Idade</td>
+			</tr>
+		</table>
+	</div>
+	
+</body>
+</html>
