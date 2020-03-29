@@ -1,7 +1,0 @@
-package teste;
-
-public class Testezao {
-	public static void main (String[] args) throws Exception {
-		System.out.println("manuel");
-	}
-}
